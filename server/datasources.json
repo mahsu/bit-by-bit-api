@@ -1,0 +1,14 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory"
+  },
+  "mongodb": {
+    "name": "mongodb",
+    "connector": "mongodb",
+    "host": "localhost",
+    "user": "",
+    "password": "",
+    "database": "bit-by-bit"
+  }
+}
