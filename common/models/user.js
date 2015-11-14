@@ -13,7 +13,7 @@ module.exports = function (User) {
     User.disableRemoteMethod("createChangeStream", true);
     User.disableRemoteMethod("exists", true);
 
-    User.disableRemoteMethod("__create__goals", false);
+    //User.disableRemoteMethod("__create__goals", false);
     User.disableRemoteMethod("__delete__goals", false);
     User.disableRemoteMethod("__destroyById__goals", false);
     User.disableRemoteMethod("__exists__goals", false);
@@ -41,7 +41,6 @@ module.exports = function (User) {
     User.disableRemoteMethod("__updateById__transactions", false);
 
     User.observe('before save', function initializeAddress(ctx, next) {
-
         if (ctx.isNewInstance) {
             var newUser = ctx.instance;
             var myWallet = new blockchain.MyWallet(config.blockchain.id, config.blockchain.password);
@@ -57,5 +56,48 @@ module.exports = function (User) {
         else {
             return next();
         }
+    });
+
+    User.withdraw = function(id, address, amount, cb) {
+        console.log(id);
+        User.findById(id, function(err, user) {
+            if (err) {
+                return cb(new Error("Unable to find user."));
+            }
+            var newbal = user.balance - amount;
+
+            if (newbal < 0) {
+                return cb(new Error("Insufficient funds"));
+            }
+            user.balance = newbal;
+
+            var myWallet = new blockchain.MyWallet(config.blockchain.id, config.blockchain.password);
+            myWallet.send({to: address, amount: amount}, function (err, result) {
+                if (err) {
+                    console.log(err);
+                    cb(new Error(err));
+                }
+                user.save(function(err) {
+                    if (err) {
+                        console.log(err);
+                        return cb(new Error());
+                    }
+                    return cb(result);
+                });
+            })
+        })
+    };
+
+    User.remoteMethod('withdraw', {
+    accepts: [
+        {arg: "address", type: "string", required: true, description: "Dest. address"},
+        {arg: "amount", type: "number", required: true, description: "In satoshi"} ],
+        description: "Withdraws an amount into an address from a user.",
+        isStatic: false,
+        http: {path: "/withdraw", verb: "post"},
+        returns: [
+            {arg: "message", type: "string"},
+            {arg: "tx_hash", type: "string"},
+            {arg: "notice", type: "string"} ]
     })
 };
