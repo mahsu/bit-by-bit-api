@@ -15,10 +15,6 @@
       "required": true,
       "index": {"unique": true}
     },
-    "from_address": {
-      "type": "string",
-      "required": true
-    },
     "date": {
       "type": "date",
       "defaultFn": "now",

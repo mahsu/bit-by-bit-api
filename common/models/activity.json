@@ -13,6 +13,7 @@
     },
     "date": {
       "type": "date",
+      "defaultFn": "now",
       "required": true
     }
   },
