@@ -1,0 +1,37 @@
+{
+  "name": "Goal",
+  "plural": "Goals",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "buyin": {
+      "type": "number",
+      "required": true
+    },
+    "distance": {
+      "type": "number",
+      "required": true
+    },
+    "start": {
+      "type": "date",
+      "required": true
+    },
+    "end": {
+      "type": "date",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "group": {
+      "type": "belongsTo",
+      "model": "Group",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

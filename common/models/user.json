@@ -1,0 +1,35 @@
+{
+  "name": "user",
+  "plural": "users",
+  "base": "User",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "address": {
+      "type": "string",
+      "required": true
+    },
+    "balance": {
+      "type": "number",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "groups": {
+      "type": "hasAndBelongsToMany",
+      "model": "Group",
+      "foreignKey": ""
+    },
+    "goals": {
+      "type": "hasMany",
+      "model": "Goal",
+      "foreignKey": "",
+      "through": "Group"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

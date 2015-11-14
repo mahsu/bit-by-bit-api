@@ -4,11 +4,11 @@
     "connector": "memory"
   },
   "mongodb": {
+    "host": "localhost",
+    "database": "bit-by-bit",
+    "password": "",
     "name": "mongodb",
     "connector": "mongodb",
-    "host": "localhost",
-    "user": "",
-    "password": "",
-    "database": "bit-by-bit"
+    "user": ""
   }
 }

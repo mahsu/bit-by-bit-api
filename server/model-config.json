@@ -14,7 +14,8 @@
     ]
   },
   "User": {
-    "dataSource": "db"
+    "dataSource": "db",
+    "public": false
   },
   "AccessToken": {
     "dataSource": "db",
@@ -36,7 +37,15 @@
     "dataSource": "mongodb",
     "public": true
   },
-  "group": {
+  "Group": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "Activity": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "Goal": {
     "dataSource": "mongodb",
     "public": true
   }

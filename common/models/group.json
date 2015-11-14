@@ -1,0 +1,30 @@
+{
+  "name": "Group",
+  "plural": "Groups",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "users": {
+      "type": "hasAndBelongsToMany",
+      "model": "user",
+      "foreignKey": ""
+    },
+    "goals": {
+      "type": "hasMany",
+      "model": "Goal",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}
