@@ -34,6 +34,11 @@
       "type": "hasMany",
       "model": "Transaction",
       "foreignKey": ""
+    },
+    "activities": {
+      "type": "hasMany",
+      "model": "Activity",
+      "foreignKey": ""
     }
   },
   "mixins": {
