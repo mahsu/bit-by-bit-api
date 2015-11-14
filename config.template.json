@@ -1,0 +1,10 @@
+{
+  "api": {
+    "_comment": "Secret api keys."
+  },
+  "blockchain": {
+    "id": "",
+    "password": "",
+    "callback_secret": ""
+  }
+}
