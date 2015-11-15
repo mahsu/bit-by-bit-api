@@ -1,6 +1,7 @@
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 
+
 var app = module.exports = loopback();
 
 app.start = function() {
@@ -17,6 +18,7 @@ app.start = function() {
 };
 
 app.use(loopback.token({ model: app.models.accessToken, currentUserLiteral: 'me' }));
+
 
 // Add Readonly Mixin to loopback
 require('loopback-ds-readonly-mixin')(app);

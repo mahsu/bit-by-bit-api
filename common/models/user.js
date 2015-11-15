@@ -7,13 +7,15 @@ module.exports = function (User) {
     User.disableRemoteMethod("create", true);
     User.disableRemoteMethod("deleteById", true);
     User.disableRemoteMethod("upsert", true);
-    User.disableRemoteMethod("find", true);
+    //User.disableRemoteMethod("find", true);
     User.disableRemoteMethod("findOne",true);
     User.disableRemoteMethod("updateAll", true);
     User.disableRemoteMethod("count", true);
     User.disableRemoteMethod("createChangeStream", true);
     User.disableRemoteMethod("exists", true);
+
     User.disableRemoteMethod("resetPassword", true);
+    User.disableRemoteMethod("confirm", true);
 
     //User.disableRemoteMethod("__create__goals", false);
     User.disableRemoteMethod("__delete__goals", false);
@@ -43,6 +45,7 @@ module.exports = function (User) {
     User.disableRemoteMethod("__updateById__transactions", false);
 
     User.observe('before save', function initializeAddress(ctx, next) {
+        console.log(ctx);
         if (ctx.isNewInstance) {
             var newUser = ctx.instance;
             var myWallet = new blockchain.MyWallet(config.blockchain.id, config.blockchain.password);
@@ -59,6 +62,33 @@ module.exports = function (User) {
             return next();
         }
     });
+
+
+    User.afterRemote('*', function stripSensitive(ctx, modelInstance, next) {
+        //strip private info
+        var WHITE_LIST_FIELDS = ["username"];
+        var answer;
+        if (ctx.result && ctx.methodString != "user.findById") {
+            if (Array.isArray(modelInstance)) {
+                answer = [];
+                ctx.result.forEach(function (result) {
+                    var replacement ={};
+                    WHITE_LIST_FIELDS.forEach(function(field) {
+                        replacement[field] = result[field];
+                    });
+                    answer.push(replacement);
+                });
+            } else {
+                answer ={};
+                WHITE_LIST_FIELDS.forEach(function(field) {
+                    answer[field] = ctx.result[field];
+                });
+            }
+            ctx.result = answer;
+        }
+        next();
+    });
+
 
     User.withdraw = function(id, address, amount, cb) {
         console.log(id);
@@ -106,16 +136,17 @@ module.exports = function (User) {
     });
 
     User.register = function(username, password, cb) {
-        User.create({username: username, password: password}, function(err, user) {
+        var credentials = {username: username, password: password};
+        User.create(credentials, function(err, user) {
             if (err) {
                 cb(new Error(err), null);
             } else {
-                user.createAccessToken(function(err, accesstoken) {
+                User.login(credentials,function(err, accesstoken) {
                     if (err) {
                         console.log(err);
-                        cb(new Error(err), null);
+                        return cb(new Error(err), null);
                     }
-                    cb(null, accesstoken.id);
+                    return cb(null, accesstoken.id);
                 });
 
             }
@@ -133,5 +164,10 @@ module.exports = function (User) {
         returns: [
             {arg: "access_token", type:"string"}
         ]
-    })
+    });
+
+    User.search = function(name, skip, l) {
+
+    }
+
 };

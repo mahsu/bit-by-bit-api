@@ -26,5 +26,8 @@
     }
   },
   "acls": [],
+  "scope": {
+    "limit": 20
+  },
   "methods": {}
 }
