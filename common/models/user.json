@@ -81,10 +81,24 @@
     },
     {
       "accessType": "READ",
+      "permission": "DENY",
+      "principalType": "ROLE",
+      "principalId": "$authorized",
+      "property": "findById"
+    },
+    {
+      "accessType": "READ",
       "permission": "ALLOW",
       "principalType": "ROLE",
       "principalId": "$owner",
       "property": "*"
+    },
+    {
+      "accessType": "EXECUTE",
+      "permission": "ALLOW",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "property": "search"
     }
   ],
   "scope": {

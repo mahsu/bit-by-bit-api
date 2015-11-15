@@ -1,6 +1,7 @@
 "use strict";
 var config = require('../../config');
 var blockchain = require('blockchain.info');
+var _ = require("underscore");
 
 module.exports = function (User) {
 
@@ -8,7 +9,7 @@ module.exports = function (User) {
     User.disableRemoteMethod("deleteById", true);
     User.disableRemoteMethod("upsert", true);
     //User.disableRemoteMethod("find", true);
-    User.disableRemoteMethod("findOne",true);
+    User.disableRemoteMethod("findOne", true);
     User.disableRemoteMethod("updateAll", true);
     User.disableRemoteMethod("count", true);
     User.disableRemoteMethod("createChangeStream", true);
@@ -64,23 +65,25 @@ module.exports = function (User) {
     });
 
 
-    User.afterRemote('*', function stripSensitive(ctx, modelInstance, next) {
+    User.afterRemote('**', function stripSensitive(ctx, modelInstance, next) {
         //strip private info
         var WHITE_LIST_FIELDS = ["username"];
+        var DISALLOWED_METHODS = ["user.find", "user.search"];
         var answer;
-        if (ctx.result && ctx.methodString != "user.findById") {
+        console.log(modelInstance);
+        if (ctx.result && _.contains(DISALLOWED_METHODS, ctx.methodString)) {
             if (Array.isArray(modelInstance)) {
                 answer = [];
                 ctx.result.forEach(function (result) {
-                    var replacement ={};
-                    WHITE_LIST_FIELDS.forEach(function(field) {
+                    var replacement = {};
+                    WHITE_LIST_FIELDS.forEach(function (field) {
                         replacement[field] = result[field];
                     });
                     answer.push(replacement);
                 });
             } else {
-                answer ={};
-                WHITE_LIST_FIELDS.forEach(function(field) {
+                answer = {};
+                WHITE_LIST_FIELDS.forEach(function (field) {
                     answer[field] = ctx.result[field];
                 });
             }
@@ -90,9 +93,9 @@ module.exports = function (User) {
     });
 
 
-    User.withdraw = function(id, address, amount, cb) {
+    User.withdraw = function (id, address, amount, cb) {
         console.log(id);
-        User.findById(id, function(err, user) {
+        User.findById(id, function (err, user) {
             if (err) {
                 return cb(new Error("Unable to find user."));
             }
@@ -109,7 +112,7 @@ module.exports = function (User) {
                     console.log(err);
                     cb(new Error(err));
                 }
-                user.save(function(err) {
+                user.save(function (err) {
                     if (err) {
                         console.log(err);
                         return cb(new Error());
@@ -121,27 +124,27 @@ module.exports = function (User) {
     };
 
     User.remoteMethod('withdraw', {
-    accepts: [
-        {arg: "address", type: "string", required: true, description: "Dest. address"},
-        {arg: "amount", type: "number", required: true, description: "In satoshi"}
-    ],
-    description: "Withdraws an amount into an address from a user.",
-    isStatic: false,
-    http: {path: "/withdraw", verb: "post"},
-    returns: [
-        {arg: "message", type: "string"},
-        {arg: "tx_hash", type: "string"},
-        {arg: "notice", type: "string"}
-    ]
+        accepts: [
+            {arg: "address", type: "string", required: true, description: "Dest. address"},
+            {arg: "amount", type: "number", required: true, description: "In satoshi"}
+        ],
+        description: "Withdraws an amount into an address from a user.",
+        isStatic: false,
+        http: {path: "/withdraw", verb: "post"},
+        returns: [
+            {arg: "message", type: "string"},
+            {arg: "tx_hash", type: "string"},
+            {arg: "notice", type: "string"}
+        ]
     });
 
-    User.register = function(username, password, cb) {
+    User.register = function (username, password, cb) {
         var credentials = {username: username, password: password};
-        User.create(credentials, function(err, user) {
+        User.create(credentials, function (err, user) {
             if (err) {
                 cb(new Error(err), null);
             } else {
-                User.login(credentials,function(err, accesstoken) {
+                User.login(credentials, function (err, accesstoken) {
                     if (err) {
                         console.log(err);
                         return cb(new Error(err), null);
@@ -162,12 +165,33 @@ module.exports = function (User) {
         isStatic: true,
         http: {path: "/register", verb: "post"},
         returns: [
-            {arg: "access_token", type:"string"}
+            {arg: "access_token", type: "string"}
         ]
     });
 
-    User.search = function(name, skip, l) {
+    User.search = function (query, skip, limit, cb) {
+        var pattern = new RegExp('^' + query+".*","i");
+        User.find({where: {username:{like: pattern}}}, function (err, users) {
+            if (err) {
+                return cb(new Error(err));
+            } else {
+                console.log(users);
+                return cb(null, users);
+            }
+        })
+    };
 
-    }
+    User.remoteMethod('search', {
+        accepts: [
+            {arg: "query", type: "string", required: true},
+            {arg: "skip", type: "number"},
+            {arg: "limit", type: "number"}
+        ],
+        description: "Searches for users.",
+        isStatic: true,
+        http: {path: "/search", verb: "get"},
+    returns: [{arg: "result", type: "array", root: true}
+    ]
+    });
 
 };
