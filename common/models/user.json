@@ -4,9 +4,19 @@
   "base": "User",
   "idInjection": true,
   "options": {
-    "validateUpsert": true
+    "validateUpsert": true,
+    "emailOptional": true
   },
   "properties": {
+    "email": {
+      "type": "string",
+      "required": false
+    },
+    "username": {
+      "type": "string",
+      "required": true,
+      "index": {"unique": true}
+    },
     "address": {
       "type": "string",
       "index": {"unique": true}

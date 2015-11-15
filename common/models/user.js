@@ -4,6 +4,7 @@ var blockchain = require('blockchain.info');
 
 module.exports = function (User) {
 
+    User.disableRemoteMethod("create", true);
     User.disableRemoteMethod("deleteById", true);
     User.disableRemoteMethod("upsert", true);
     User.disableRemoteMethod("find", true);
@@ -12,6 +13,7 @@ module.exports = function (User) {
     User.disableRemoteMethod("count", true);
     User.disableRemoteMethod("createChangeStream", true);
     User.disableRemoteMethod("exists", true);
+    User.disableRemoteMethod("resetPassword", true);
 
     //User.disableRemoteMethod("__create__goals", false);
     User.disableRemoteMethod("__delete__goals", false);
@@ -91,13 +93,45 @@ module.exports = function (User) {
     User.remoteMethod('withdraw', {
     accepts: [
         {arg: "address", type: "string", required: true, description: "Dest. address"},
-        {arg: "amount", type: "number", required: true, description: "In satoshi"} ],
-        description: "Withdraws an amount into an address from a user.",
-        isStatic: false,
-        http: {path: "/withdraw", verb: "post"},
+        {arg: "amount", type: "number", required: true, description: "In satoshi"}
+    ],
+    description: "Withdraws an amount into an address from a user.",
+    isStatic: false,
+    http: {path: "/withdraw", verb: "post"},
+    returns: [
+        {arg: "message", type: "string"},
+        {arg: "tx_hash", type: "string"},
+        {arg: "notice", type: "string"}
+    ]
+    });
+
+    User.register = function(username, password, cb) {
+        User.create({username: username, password: password}, function(err, user) {
+            if (err) {
+                cb(new Error(err), null);
+            } else {
+                user.createAccessToken(function(err, accesstoken) {
+                    if (err) {
+                        console.log(err);
+                        cb(new Error(err), null);
+                    }
+                    cb(null, accesstoken.id);
+                });
+
+            }
+        })
+    };
+
+    User.remoteMethod('register', {
+        accepts: [
+            {arg: "username", type: "string", required: true},
+            {arg: "password", type: "string", required: true}
+        ],
+        description: "Registers a new user.",
+        isStatic: true,
+        http: {path: "/register", verb: "post"},
         returns: [
-            {arg: "message", type: "string"},
-            {arg: "tx_hash", type: "string"},
-            {arg: "notice", type: "string"} ]
+            {arg: "access_token", type:"string"}
+        ]
     })
 };
