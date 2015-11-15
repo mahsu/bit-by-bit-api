@@ -49,6 +49,20 @@
       "type": "hasMany",
       "model": "Activity",
       "foreignKey": ""
+    },
+    "frienders": {
+      "type": "hasMany",
+      "foreignKey": "friendeeId",
+      "model": "user",
+      "through": "Friend",
+      "keyThrough": "frienderId"
+    },
+    "friendees": {
+      "type": "hasMany",
+      "foreignKey": "frienderId",
+      "model": "user",
+      "through": "Friend",
+      "keyThrough": "friendeeId"
     }
   },
   "mixins": {

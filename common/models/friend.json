@@ -1,0 +1,26 @@
+{
+  "name": "Friend",
+  "plural": "Friends",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+  },
+  "validations": [],
+  "relations": {
+    "friender": {
+      "type": "belongsTo",
+      "model": "user",
+      "foreignKey": ""
+    },
+    "friendee": {
+      "type": "belongsTo",
+      "model": "user",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

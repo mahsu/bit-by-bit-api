@@ -52,5 +52,9 @@
   "Transaction": {
     "dataSource": "mongodb",
     "public": false
+  },
+  "Friend": {
+    "dataSource": "mongodb",
+    "public": true
   }
 }
